@@ -1,4 +1,15 @@
 <resources>
-    <string name="app_name">BlutoothTest</string>
+    <string name="app_name">BlutoothChat</string>
     <string name="but">Senden</string>
+    <string name="search">Search Devices</string>
+    <string name="switch_on">Switch on Bluetooth</string>
+
+
+    <string name="paired_dev">Paired Devices</string>
+    <string name="avaliable_dev">Avaliable Devices</string>
+    <string name="meun_scan_dev">Scan Devices</string>
+
+
+
+
 </resources>
