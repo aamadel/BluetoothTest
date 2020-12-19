@@ -2,22 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-
-        android:id="@+id/search_div"
-        app:showAsAction="always"
+        android:id="@+id/menu_search_devices"
         android:icon="@drawable/add_person"
         android:title="@string/search"
-
-        />
+        app:showAsAction="always" />
 
     <item
-
-        android:id="@+id/switchOn"
-        app:showAsAction="always"
+        android:id="@+id/menu_enable_bluetooth"
         android:icon="@drawable/blto"
-        android:title="@string/switch_on"
-
-        />
-
-
+        android:title="@string/but"
+        app:showAsAction="always" />
 </menu>

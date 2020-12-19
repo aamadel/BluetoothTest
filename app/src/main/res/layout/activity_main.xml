@@ -8,7 +8,7 @@
 
 
     <ListView
-        android:id="@+id/liste"
+        android:id="@+id/listMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="53dp"
@@ -29,7 +29,7 @@
 
 
         <Button
-            android:id="@+id/b1"
+            android:id="@+id/sendMess"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

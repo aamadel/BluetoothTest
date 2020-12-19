@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.content.ClipData;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,22 +19,38 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import static com.example.blutoothtest.R.id.search_div;
+import java.io.IOException;
+
 
 public class MainActivity extends AppCompatActivity {
 
 
     private Context context;
+
     private BluetoothAdapter bluetoothAdapter;
+
     private ChatUtils chatUtils;
     // unique for Activity
     private final int location_persmission_request = 101;
 
     private final int select_dev = 102;
+
+
+    private ListView listMain;
+
+    private EditText creatMess;
+
+    private Button sendMess;
+
+    private ArrayAdapter<String> chatAdapter;
+
 
     public static final int MESS_STATE_CHANGE = 0;
     public static final int MESS_READ = 1;
@@ -44,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String DEV_NAME = "device Name : ";//key for handler , case dev_name
     public static final String TOAST = "toast ";//key for handler , case mess_toast
     private String connenctedDev;
-
 
     //handelt alle Nachrichten , die zum MainActivity kommen !
 
@@ -84,8 +99,21 @@ public class MainActivity extends AppCompatActivity {
 
                     break;
                 case MESS_WRITE:
+
+                    byte[] bufferWr = (byte[]) msg.obj;
+
+                    String outputbuffer = new String(bufferWr);
+
+                    chatAdapter.add(" Ich : " + outputbuffer);
+
+
                     break;
                 case MESS_READ:
+                    byte[] buffer = (byte[]) msg.obj;
+                    String inputbuffer = new String(buffer, 0, msg.arg1);
+
+                    chatAdapter.add(connenctedDev + ": " + inputbuffer);
+
                     break;
 
                 case MESS_DEV_NAME:
@@ -101,8 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         }
-    });
-
+    });//بيبعت ويستقبل كل المعلومات الي جايه من الثريدز الي في الشات يوتليز
 
     private void setState(CharSequence subTitle) {//to reflect the states of the handler , which showing to chatuitils
 
@@ -110,16 +137,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
-        chatUtils = new ChatUtils(context, handler);
+        init();
         initBluetooth();
+        chatUtils = new ChatUtils(context, handler);
     }
 
     private void checkPermission() {
@@ -199,18 +225,47 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    private void init() {
+        listMain = findViewById(R.id.listMain);
+        sendMess = findViewById(R.id.sendMess);
+        creatMess = findViewById(R.id.txt1);
+        chatAdapter = new ArrayAdapter<String>(context, R.layout.message_layout);
+        listMain.setAdapter(chatAdapter);
+
+        sendMess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String mess = creatMess.getText().toString();
+                if (!mess.isEmpty()) {
+
+                    try {
+                        creatMess.setText("");
+                        chatUtils.write(mess.getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+
+            }
+        });
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
 
         switch (item.getItemId()) {
 
-            case search_div:
+            case R.id.menu_search_devices:
 
                 checkPermission();
                 return true;
 
-            case R.id.switchOn:
+            case R.id.menu_enable_bluetooth:
                 enableBlutooth();
                 return true;
 
@@ -229,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == select_dev && resultCode == RESULT_OK) {
 
             String addr = data.getStringExtra("deviceAddress");
-            Toast.makeText(context, " Addresse : " + addr, Toast.LENGTH_SHORT).show();
+            chatUtils.connect(bluetoothAdapter.getRemoteDevice(addr));
 
 
         }
@@ -255,5 +310,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+        if (chatUtils != null) {
+
+
+            chatUtils.stop();
+
+
+        }
+
+    }
 }
