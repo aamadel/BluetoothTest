@@ -148,6 +148,78 @@ public class MainActivity extends AppCompatActivity {
         chatUtils = new ChatUtils(context, handler);
     }
 
+    private void init() {
+        listMain = findViewById(R.id.listMain);
+        sendMess = findViewById(R.id.sendMess);
+        creatMess = findViewById(R.id.txt1);
+        chatAdapter = new ArrayAdapter<String>(context, R.layout.message_layout);
+        listMain.setAdapter(chatAdapter);
+
+        sendMess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String mess = creatMess.getText().toString();
+                if (!mess.isEmpty()) {
+
+                    try {
+                        creatMess.setText("");
+                        chatUtils.write(mess.getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+
+            }
+        });
+
+    }
+
+    private void initBluetooth() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+
+        if (bluetoothAdapter == null) {
+
+            Toast.makeText(context, "Sie haben Kein Bluetooth auf Ihr Geraet !!", Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+
+        switch (item.getItemId()) {
+
+            case R.id.menu_search_devices:
+
+                checkPermission();
+                return true;
+
+            case R.id.menu_enable_bluetooth:
+                enableBlutooth();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+
+    }
+
     private void checkPermission() {
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -165,6 +237,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+
+        if (requestCode == select_dev && resultCode == RESULT_OK) {
+
+            String addr = data.getStringExtra("deviceAddress");
+            chatUtils.connect(bluetoothAdapter.getRemoteDevice(addr));
+
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -205,92 +291,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initBluetooth() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-
-        if (bluetoothAdapter == null) {
-
-            Toast.makeText(context, "Sie haben Kein Bluetooth auf Ihr Geraet !!", Toast.LENGTH_SHORT).show();
-
-        }
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    private void init() {
-        listMain = findViewById(R.id.listMain);
-        sendMess = findViewById(R.id.sendMess);
-        creatMess = findViewById(R.id.txt1);
-        chatAdapter = new ArrayAdapter<String>(context, R.layout.message_layout);
-        listMain.setAdapter(chatAdapter);
-
-        sendMess.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String mess = creatMess.getText().toString();
-                if (!mess.isEmpty()) {
-
-                    try {
-                        creatMess.setText("");
-                        chatUtils.write(mess.getBytes());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-
-            }
-        });
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-
-        switch (item.getItemId()) {
-
-            case R.id.menu_search_devices:
-
-                checkPermission();
-                return true;
-
-            case R.id.menu_enable_bluetooth:
-                enableBlutooth();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-
-        }
-
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
-
-        if (requestCode == select_dev && resultCode == RESULT_OK) {
-
-            String addr = data.getStringExtra("deviceAddress");
-            chatUtils.connect(bluetoothAdapter.getRemoteDevice(addr));
-
-
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
     private void enableBlutooth() {
 
         if (!bluetoothAdapter.isEnabled()) {
@@ -324,3 +324,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 }
+

@@ -35,8 +35,6 @@ public class ChatUtils {
     public static final int STATE_LISTEN = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
-
-
     private int state; //handel the grand state to our utiliti
 
 
@@ -427,3 +425,4 @@ public class ChatUtils {
     }
 
 }
+
